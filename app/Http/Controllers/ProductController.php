@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductRequest;
+use App\Models\Categories;
 use App\Models\Products;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -25,7 +27,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Categories::orderBy('name')->get();
+        return view('admin.product.create', compact('categories'));
     }
 
     /**
@@ -34,9 +37,26 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        //
+        $product =  new Products();
+
+        $product->name = $request->name;
+        $product->category = $request->category;
+
+        try {
+            if($request->hasFile('image'))
+            {
+                $image = $request->file('image');
+                $imageName = 'products/'.time() . "." . $image->extension();
+                $product->image = $imageName;
+                Storage::put('public/'.$imageName, file_get_contents($image));
+            }
+            $product->save();
+            return redirect()->route('products.index')->with(['success'=>'Product added successfully']);
+        } catch (\Throwable $th) {
+            return redirect()->route('products.index')->with(['error'=>'Product adding failed']);
+        }
     }
 
     /**
@@ -47,7 +67,8 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        //
+        $product = Products::findorFail($id);
+        return view('admin.product.show', compact('product'));
     }
 
     /**
@@ -58,7 +79,9 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        //
+        $categories = Categories::orderBy('name')->get();
+        $product = Products::findorFail($id);
+        return view('admin.product.edit', compact('categories','product'));
     }
 
     /**
@@ -68,9 +91,29 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ProductRequest $request, $id)
     {
-        //
+        $product = Products::findorFail($id);
+
+        $product->name = $request->name;
+        $product->category = $request->category;
+
+        try {
+            if($request->hasFile('image'))
+            {
+                $image = $request->file('image');
+                if($product->image != NULL){
+                    Storage::delete('public/'.$product->image);
+                }
+                $imageName = 'products/'.time() . "." . $image->extension();
+                $product->image = $imageName;
+                Storage::put('public/'.$imageName, file_get_contents($image));
+            }
+            $product->save();
+            return redirect()->route('products.index')->with(['success'=>'Product edited successfully']);
+        } catch (\Throwable $th) {
+            return redirect()->route('products.index')->with(['error'=>'Product editing failed']);
+        }
     }
 
     /**
@@ -81,6 +124,12 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $product = Products::findorFail($id);
+        try {
+            $product->delete();
+            return redirect()->route('products.index')->with(['success'=>'Product deleted successfully']);
+        } catch (\Throwable $th) {
+            return redirect()->route('products.index')->with(['error'=>'Product deleting failed']);
+        }
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
 use App\Models\Categories;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
@@ -99,7 +98,9 @@ class CategoryController extends Controller
             if($request->hasFile('image'))
             {
                 $image = $request->file('image');
-                Storage::delete('public/'.$category->image);
+                if($category->image != NULL){
+                    Storage::delete('public/'.$category->image);
+                }
                 $imageName = 'categories/'.time() . "." . $image->extension();
                 $category->image = $imageName;
                 Storage::put('public/'.$imageName, file_get_contents($image));
