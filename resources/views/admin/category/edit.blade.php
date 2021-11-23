@@ -33,19 +33,20 @@
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form action="{{ route('categories.store') }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('categories.update',['category'=>$category->id]) }}" method="POST" enctype="multipart/form-data">
                             @csrf
+                            @method('PUT')
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="name">Category Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="name" id="name" placeholder="Enter category name" required>
+                                    <input type="text" class="form-control" name="name" id="name" placeholder="Enter category name" value="{{ $category->name }}" required>
                                     @error('name')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
                                 </div>
                                 <div class="form-group">
                                     <label for="desc">Category Description</label>
-                                    <textarea class="form-control" rows="3" name="description" id="desc" placeholder="Enter category description"></textarea>
+                                    <textarea class="form-control" rows="3" name="description" id="desc" placeholder="Enter category description">{{ $category->description }}</textarea>
                                     @error('description')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror

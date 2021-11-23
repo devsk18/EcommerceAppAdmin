@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CategoryRequest;
 use App\Models\Categories;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -46,13 +47,14 @@ class CategoryController extends Controller
             if($request->hasFile('image'))
             {
                 $image = $request->file('image');
-                $imageName = time() . "." . $image->extension();
+                $imageName = 'categories/'.time() . "." . $image->extension();
                 $category->image = $imageName;
-                Storage::put('public/categories')
+                Storage::put('public/'.$imageName, file_get_contents($image));
             }
             $category->save();
+            return redirect()->route('categories.index')->with(['success'=>'Category added successfully']);
         } catch (\Throwable $th) {
-            
+            return redirect()->route('categories.index')->with(['error'=>'Category adding failed']);
         }
     }
 
@@ -64,7 +66,8 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        //
+        $category = Categories::findorFail($id);
+        return view('admin.category.show', compact('category'));
     }
 
     /**
@@ -75,7 +78,8 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        //
+        $category = Categories::findorFail($id);
+        return view('admin.category.edit', compact('category'));
     }
 
     /**
@@ -85,9 +89,26 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CategoryRequest $request, $id)
     {
-        //
+        $category = Categories::findorFail($id);
+        $category->name = $request->name;
+        $category->description = $request->description;
+
+        try {
+            if($request->hasFile('image'))
+            {
+                $image = $request->file('image');
+                Storage::delete('public/'.$category->image);
+                $imageName = 'categories/'.time() . "." . $image->extension();
+                $category->image = $imageName;
+                Storage::put('public/'.$imageName, file_get_contents($image));
+            }
+            $category->save();
+            return redirect()->route('categories.index')->with(['success'=>'Category edited successfully']);
+        } catch (\Throwable $th) {
+            return redirect()->route('categories.index')->with(['error'=>'Category editing failed']);
+        }
     }
 
     /**
@@ -98,6 +119,12 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $category = Categories::findorFail($id);
+        try {
+            $category->delete();
+            return redirect()->route('categories.index')->with(['success'=>'Category deleted successfully']);
+        } catch (\Throwable $th) {
+            return redirect()->route('categories.index')->with(['error'=>'Category deleting failed']);
+        }
     }
 }

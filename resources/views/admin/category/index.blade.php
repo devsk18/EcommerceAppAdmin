@@ -34,6 +34,7 @@
                             </div>
                         </div>
                         <!-- /.card-header -->
+                        @include('includes.alert')
                         <div class="card-body table-responsive p-0" tyle="height: 500px;">
                             <table class="table table-head-fixed table-hover text-nowrap">
                                 <thead>
@@ -55,7 +56,7 @@
                                         <td><a href="{{ route('categories.show',['category'=>$category->id]) }}" class="btn btn-primary">View</a></td>
                                         <td><a href="{{ route('categories.edit',['category'=>$category->id]) }}" class="btn btn-warning text-white">Edit</a></td>
                                         <td>
-                                            <form action="{{ route('categories.show',['category'=>$category->id]) }}" method="post">
+                                            <form action="{{ route('categories.destroy',['category'=>$category->id]) }}" method="post">
                                                 @method('DELETE')
                                                 @csrf
                                                 <button class="btn btn-danger" type="submit">Delete</button>
