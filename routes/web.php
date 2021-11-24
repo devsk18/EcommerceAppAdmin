@@ -14,7 +14,10 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+//---------Home route--------------------//
+Route::get('/', function(){
+    return view('index');
+});
 
 //---------Authentication Routes---------//
 Route::group([

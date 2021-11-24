@@ -40,6 +40,7 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
+                                        <th>Image</th>
                                         <th>Name</th>
                                         <th>Category</th>
                                         <th>Created On</th>
@@ -52,6 +53,11 @@
                                     @foreach($products as $product)
                                     <tr>
                                         <td>{{ ($products->currentPage()-1)*$products->perPage()+$loop->iteration }}</td>
+                                        <td>
+                                            @if($product->image != NULL)
+                                                <img src="{{ asset('storage//'.$product->image) }}" width="50px" height="50px">
+                                            @endif
+                                        </td>
                                         <td>{{ $product->name }}</td>
                                         <td>{{ $product->categoryRelation->name }}</td>
                                         <td>{{ getFormatedDate($product->created_at) }}</td>

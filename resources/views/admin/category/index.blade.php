@@ -40,6 +40,7 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
+                                        <th>Image</th>
                                         <th>Name</th>
                                         <th>Created On</th>
                                         <th>View</th>
@@ -51,6 +52,11 @@
                                     @foreach($categories as $category)
                                     <tr>
                                         <td>{{ ($categories->currentPage()-1)*$categories->perPage()+$loop->iteration }}</td>
+                                        <td>
+                                            @if($category->image != NULL)
+                                                <img src="{{ asset('storage//'.$category->image) }}" width="50px" height="50px">
+                                            @endif
+                                        </td>
                                         <td>{{ $category->name }}</td>
                                         <td>{{ getFormatedDate($category->created_at) }}</td>
                                         <td><a href="{{ route('categories.show',['category'=>$category->id]) }}" class="btn btn-primary">View</a></td>
